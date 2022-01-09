@@ -1,10 +1,10 @@
-import './App.css';
-import MainComp from './views/main';
+import "./App.css";
+import MainComp from "./views/main";
 
 function App() {
   return (
     <div className="App">
-    <MainComp/>
+      <MainComp />
     </div>
   );
 }
