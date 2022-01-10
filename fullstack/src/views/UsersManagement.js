@@ -41,19 +41,6 @@ function AllUsersComp() {
   const [addUser, setAddUser] = useState(false);
   const [user, setUser] = useState({});
   const [date, setdate] = useState("");
-  const [SubscriptionsPer, setSubscriptionsPer] = useState({
-    CreateSubscriptions: false,
-    DeleteSubscriptions: false,
-    UpdateSubscriptions: false,
-  });
-  const [SubscriptionsPerisChecked, setSubscriptionsPerisChecked] =
-    useState(false);
-  const [MoviesPer, setMoviesPer] = useState({
-    CreateMovies: false,
-    DeleteMovies: false,
-    UpdateMovies: false,
-  });
-  const [MoviesPerisChecked, setMoviesPerisChecked] = useState(false);
   const [permissionName, setpermissionName] = useState([]);
 
   useEffect(() => {
@@ -71,46 +58,6 @@ function AllUsersComp() {
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (
-        SubscriptionsPer.CreateSubscriptions ||
-        SubscriptionsPer.DeleteSubscriptions ||
-        SubscriptionsPer.UpdateSubscriptions
-      ) {
-        setSubscriptionsPerisChecked(true);
-      }
-      if (
-        !SubscriptionsPer.CreateSubscriptions &&
-        !SubscriptionsPer.DeleteSubscriptions &&
-        !SubscriptionsPer.UpdateSubscriptions
-      ) {
-        setSubscriptionsPerisChecked(false);
-      }
-    }
-    fetchData();
-  }, [SubscriptionsPer]);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (
-        MoviesPer.CreateMovies ||
-        MoviesPer.DeleteMovies ||
-        MoviesPer.UpdateMovies
-      ) {
-        setMoviesPerisChecked(true);
-      }
-      if (
-        !MoviesPer.CreateMovies &&
-        !MoviesPer.DeleteMovies &&
-        !MoviesPer.UpdateMovies
-      ) {
-        setMoviesPerisChecked(false);
-      }
-    }
-    fetchData();
-  }, [MoviesPer]);
 
   const addNewUser = async () => {
     let resp = await usersUtils.addUser(user);
@@ -152,7 +99,7 @@ function AllUsersComp() {
     if (findMovPer) {
       if (!permissionName.find((x) => x === "View Movies")) {
         let arr = permissionName;
-        arr.unshift("View Movies");
+        arr.push("View Movies");
         setUser({ ...user, Permissions: arr });
       }
     }
