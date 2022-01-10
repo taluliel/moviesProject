@@ -6,29 +6,41 @@ import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import Input from "@mui/material/Input";
 import CardActions from "@mui/material/CardActions";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import ListItemText from "@mui/material/ListItemText";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
+import {
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@material-ui/core";
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const names = [
+  "View Subscriptions",
+  "Create Subscriptions",
+  "Delete Subscriptions",
+  "Update Subscriptions",
+  "View Movies",
+  "Create Movies",
+  "Delete Movies",
+  "Update Movies",
+];
 const UserComp = (props) => {
   const [user, setUser] = useState({});
   const [editUser, setEditUser] = useState(false);
   const [disable, setdisable] = useState(true);
-  // const inputRef = useRef(null);
-  // const [permissions, setPermissions] = useState([]);
-  // const permissionsNames = [
-  //   "View Subscriptions",
-  //   "Create Subscriptions",
-  //   "Delete Subscriptions",
-  //   "Update Subscriptions",
-  //   "View Movies",
-  //   "Create Movies",
-  //   "Delete Movies",
-  //   "Update Movies",
-  // ];
+  const [personName, setPersonName] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -38,27 +50,22 @@ const UserComp = (props) => {
   }, [props]);
 
   const deleteUser = async () => {
-    return await UsersUtils.deleteUser(props.user.id);
+    let resp = await UsersUtils.deleteUser(props.user.id);
+    props.updateUser(resp);
   };
 
   const updateUser = async () => {
-    if (user) {
-      await UsersUtils.EditUser(props.user.id, user);
-      setEditUser(!editUser);
-    }
+    let resp = await UsersUtils.EditUser(props.user.id, user);
+    setEditUser(!editUser);
+    props.updateUser(resp);
   };
 
-  // const handleChange = (event) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   setPermissions(typeof value === "string" ? value.split(",") : value);
-  //   setUser({ ...user, Permissions: permissions });
-  // };
-
-  // const handleSubmitButton = () => {
-  //   alert(inputRef.current.value);
-  // };
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(typeof value === "string" ? value.split(",") : value);
+  };
 
   return (
     <Card>
@@ -95,87 +102,33 @@ const UserComp = (props) => {
             onChange={(e) => setUser({ ...user, userName: e.target.value })}
           />
           <br />
-          {/* 
-          <FormControl sx={{ m: 1, width: 300 }}>
-            <InputLabel id="demo-multiple-checkbox-label">Permissions</InputLabel>
+          Permissons:
+          <br />
+          <FormControl sx={{ m: 1, width: 300 }} style={{ width: "80%" }}>
+            <InputLabel id="demo-multiple-name-label">Permissons</InputLabel>
             <Select
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               multiple
-              disabled={disable}
-              value={permissions}
+              value={personName}
               onChange={handleChange}
-              input={<OutlinedInput label="Permissions" />}
-              renderValue={(selected) => selected.join(', ')}
+              input={<OutlinedInput label="Tag" />}
+              renderValue={(selected) => selected.join(", ")}
+              MenuProps={MenuProps}
+              disabled={disable}
+              onClose={() => {
+                setUser({ ...user, Permissions: personName });
+              }}
             >
-              {permissionsNames.map((name, index) => (
-                <MenuItem key={index} value={name}>
-                  <Checkbox checked={(props.user.Permissions).includes(name) ? true : false} />
+              {names.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={personName.indexOf(name) > -1} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
             </Select>
-          </FormControl> */}
-          Permissons:
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="View Subscriptions"
-            id="View Subscriptions"
-          />
-          <label htmlFor="ViewSubscriptions"> View Subscriptions</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Create Subscriptions"
-            id="Create Subscriptions"
-            onclick="CheckSub()"
-          />
-          <label htmlFor="CreateSubscriptions"> Create Subscriptions</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Delete Subscriptions"
-            id="Delete Subscriptions"
-            onclick="CheckSub()"
-          />
-          <label htmlFor="DeleteSubscriptions"> Delete Subscriptions</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Update Subscriptions"
-            id="Update Subscriptions"
-            onclick="CheckSub()"
-          />
-          <label htmlFor="UpdateSubscriptions"> Update Subscriptions</label>
-          <br />
-          <Checkbox name="Permissions" value="View Movies" id="View Movies" />
-          <label htmlFor="ViewMovies"> View Movies</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Create Movies"
-            id="Create Movies"
-            onclick="CheckMovie()"
-          />
-          <label htmlFor="CreateMovies"> Create Movies</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Delete Movies"
-            id="Delete Movies"
-            onclick="CheckMovie()"
-          />
-          <label htmlFor="DeleteMovies"> Delete Movies</label>
-          <br />
-          <Checkbox
-            name="Permissions"
-            value="Update Movies"
-            id="Update Movies"
-            onclick="CheckMovie()"
-          />
-          <label htmlFor="UpdateMovies">Update Movies</label>
-          <br />
+          </FormControl>
+          <br /> <br />
           {!disable && (
             <Button
               variant="contained"

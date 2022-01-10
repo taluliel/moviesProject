@@ -5,6 +5,36 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import Input from "@mui/material/Input";
+import {
+  FormControl,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@material-ui/core";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const names = [
+  "View Subscriptions",
+  "Create Subscriptions",
+  "Delete Subscriptions",
+  "Update Subscriptions",
+  "View Movies",
+  "Create Movies",
+  "Delete Movies",
+  "Update Movies",
+];
 
 function AllUsersComp() {
   const [users, setUsers] = useState([]);
@@ -25,10 +55,12 @@ function AllUsersComp() {
   });
   const [MoviesPerisChecked, setMoviesPerisChecked] = useState(false);
   const [permissions, setPermissions] = useState([]);
+  const [personName, setPersonName] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       let allUsers = await usersUtils.allUsers();
+      console.log(allUsers);
       let today = new Date();
       let currentDate =
         today.getFullYear() +
@@ -82,37 +114,20 @@ function AllUsersComp() {
     fetchData();
   }, [MoviesPer]);
 
-  //Create permissions array
-  const addPermissions = (e) => {
-    let per = permissions;
-    console.log(e.target.value);
-    if (e.target.checked) {
-      per.push(e.target.value);
-    }
-    if (!e.target.checked) {
-      let index = per.indexOf(e.target.value);
-      per.splice(index, 1);
-    }
-
-    if (SubscriptionsPerisChecked) {
-      per.push("View Subscriptions");
-    } else if (!SubscriptionsPerisChecked) {
-      let index = per.indexOf("View Subscriptions");
-      per.splice(index, 1);
-    }
-    if (MoviesPerisChecked) {
-      per.push("View Movies");
-    } else if (!MoviesPerisChecked) {
-      let index = per.indexOf("View Movies");
-      per.splice(index, 1);
-    }
-    setPermissions(per);
-    setUser({ ...user, Permissions: permissions });
+  const addNewUser = async () => {
+    let resp = await usersUtils.addUser(user);
+    setAddUser(!addUser);
+    setUsers(resp);
   };
 
-  const addNewUser = async () => {
-    await usersUtils.addUser(user);
-    setAddUser(!addUser);
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
   };
 
   return (
@@ -161,120 +176,30 @@ function AllUsersComp() {
             Created Date : <Input disabled name="CreatedDate" value={date} />
             <br />
             Permissions : <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              checked={SubscriptionsPerisChecked}
-              onChange={() =>
-                setSubscriptionsPerisChecked(!SubscriptionsPerisChecked)
-              }
-              type="checkbox"
-              value="View Subscriptions"
-              id="ViewSubscriptions"
-            />
-            <label htmlFor="ViewSubscriptions"> View Subscriptions</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Create Subscriptions"
-              id="CreateSubscriptions"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setSubscriptionsPer({
-                  ...SubscriptionsPer,
-                  CreateSubscriptions: !SubscriptionsPer.CreateSubscriptions,
-                })
-              }
-            />
-            <label htmlFor="CreateSubscriptions"> Create Subscriptions</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Delete Subscriptions"
-              id="DeleteSubscriptions"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setSubscriptionsPer({
-                  ...SubscriptionsPer,
-                  DeleteSubscriptions: !SubscriptionsPer.DeleteSubscriptions,
-                })
-              }
-            />
-            <label htmlFor="DeleteSubscriptions"> Delete Subscriptions</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Update Subscriptions"
-              id="UpdateSubscriptions"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setSubscriptionsPer({
-                  ...SubscriptionsPer,
-                  UpdateSubscriptions: !SubscriptionsPer.UpdateSubscriptions,
-                })
-              }
-            />
-            <label htmlFor="UpdateSubscriptions"> Update Subscriptions</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              checked={MoviesPerisChecked}
-              onChange={() => setMoviesPerisChecked(!MoviesPerisChecked)}
-              type="checkbox"
-              value="View Movies"
-              id="ViewMovies"
-            />
-            <label htmlFor="ViewMovies"> View Movies</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Create Movies"
-              id="CreateMovies"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setMoviesPer({
-                  ...MoviesPer,
-                  CreateMovies: !MoviesPer.CreateMovies,
-                })
-              }
-            />
-            <label htmlFor="CreateMovies"> Create Movies</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Delete Movies"
-              id="DeleteMovies"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setMoviesPer({
-                  ...MoviesPer,
-                  DeleteMovies: !MoviesPer.DeleteMovies,
-                })
-              }
-            />
-            <label htmlFor="DeleteMovies"> Delete Movies</label>
-            <br />
-            <Checkbox
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 20 } }}
-              name="Permissions"
-              value="Update Movies"
-              id="UpdateMovies"
-              onChange={addPermissions}
-              onClick={(e) =>
-                setMoviesPer({
-                  ...MoviesPer,
-                  UpdateMovies: !MoviesPer.UpdateMovies,
-                })
-              }
-            />
-            <label htmlFor="UpdateMovies">Update Movies</label>
-            <br />
+            <FormControl sx={{ m: 1, width: 300 }} style={{ width: "80%" }}>
+              <InputLabel id="demo-multiple-name-label">Permissions</InputLabel>
+              <Select
+                labelId="demo-multiple-checkbox-label"
+                id="demo-multiple-checkbox"
+                multiple
+                value={personName}
+                onChange={handleChange}
+                input={<OutlinedInput label="Tag" />}
+                renderValue={(selected) => selected.join(", ")}
+                MenuProps={MenuProps}
+                onClose={() => {
+                  setUser({ ...user, Permissions: personName });
+                }}
+              >
+                {names.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    <Checkbox checked={personName.indexOf(name) > -1} />
+                    <ListItemText primary={name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <br /> <br />
             <Button
               size="small"
               color="success"
@@ -282,7 +207,8 @@ function AllUsersComp() {
               onClick={addNewUser}
             >
               Save
-            </Button>
+            </Button>{" "}
+            {""}
             <Button
               size="small"
               color="inherit"
@@ -308,7 +234,7 @@ function AllUsersComp() {
             <Grid key={item.id} item xs={4}>
               {" "}
               <div>
-                <UserComp user={item} />
+                <UserComp user={item} updateUser={(data) => setUsers(data)} />
                 <br />
               </div>{" "}
             </Grid>
