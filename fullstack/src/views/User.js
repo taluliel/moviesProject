@@ -45,7 +45,7 @@ const UserComp = (props) => {
 
   useEffect(() => {
     async function fetchData() {
-      console.log(props.user);
+      console.log(props.user.Permissions);
       setUser(props.user);
     }
     fetchData();
@@ -107,7 +107,7 @@ const UserComp = (props) => {
           />
           <br />
           Permissons:
-          {props.user.Permissions.length > 0 && (
+          {props.user.Permissions && (
             <Grid item xs={6}>
               <ul>
                 {props.user.Permissions.map((per, index) => {

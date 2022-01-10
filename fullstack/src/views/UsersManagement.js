@@ -126,6 +126,38 @@ function AllUsersComp() {
     setpermissionName(typeof value === "string" ? value.split(",") : value);
   };
 
+  const checkPermissions = () => {
+    setUser({ ...user, Permissions: permissionName });
+
+    let findSubPer = permissionName.find(
+      (x) =>
+        x === "Create Subscriptions" ||
+        x === "Delete Subscriptions" ||
+        x === "Update Subscriptions"
+    );
+
+    let findMovPer = permissionName.find(
+      (x) =>
+        x === "Create Movies" || x === "Delete Movies" || x === "Update Movies"
+    );
+
+    if (findSubPer) {
+      if (!permissionName.find((x) => x === "View Subscriptions")) {
+        let arr = permissionName;
+        arr.unshift("View Subscriptions");
+        setUser({ ...user, Permissions: arr });
+      }
+    }
+
+    if (findMovPer) {
+      if (!permissionName.find((x) => x === "View Movies")) {
+        let arr = permissionName;
+        arr.unshift("View Movies");
+        setUser({ ...user, Permissions: arr });
+      }
+    }
+  };
+
   return (
     <div className="App">
       <h1>Users</h1>
@@ -183,9 +215,7 @@ function AllUsersComp() {
                 input={<OutlinedInput label="Tag" />}
                 renderValue={(selected) => selected.join(", ")}
                 MenuProps={MenuProps}
-                onClose={() => {
-                  setUser({ ...user, Permissions: permissionName });
-                }}
+                onClose={checkPermissions}
               >
                 {names.map((name) => (
                   <MenuItem key={name} value={name}>
