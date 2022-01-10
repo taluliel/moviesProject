@@ -54,13 +54,11 @@ function AllUsersComp() {
     UpdateMovies: false,
   });
   const [MoviesPerisChecked, setMoviesPerisChecked] = useState(false);
-  const [permissions, setPermissions] = useState([]);
-  const [personName, setPersonName] = useState([]);
+  const [permissionName, setpermissionName] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       let allUsers = await usersUtils.allUsers();
-      console.log(allUsers);
       let today = new Date();
       let currentDate =
         today.getFullYear() +
@@ -117,6 +115,7 @@ function AllUsersComp() {
   const addNewUser = async () => {
     let resp = await usersUtils.addUser(user);
     setAddUser(!addUser);
+    setpermissionName([]);
     setUsers(resp);
   };
 
@@ -124,10 +123,7 @@ function AllUsersComp() {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
+    setpermissionName(typeof value === "string" ? value.split(",") : value);
   };
 
   return (
@@ -182,18 +178,18 @@ function AllUsersComp() {
                 labelId="demo-multiple-checkbox-label"
                 id="demo-multiple-checkbox"
                 multiple
-                value={personName}
+                value={permissionName}
                 onChange={handleChange}
                 input={<OutlinedInput label="Tag" />}
                 renderValue={(selected) => selected.join(", ")}
                 MenuProps={MenuProps}
                 onClose={() => {
-                  setUser({ ...user, Permissions: personName });
+                  setUser({ ...user, Permissions: permissionName });
                 }}
               >
                 {names.map((name) => (
                   <MenuItem key={name} value={name}>
-                    <Checkbox checked={personName.indexOf(name) > -1} />
+                    <Checkbox checked={permissionName.indexOf(name) > -1} />
                     <ListItemText primary={name} />
                   </MenuItem>
                 ))}
@@ -213,7 +209,10 @@ function AllUsersComp() {
               size="small"
               color="inherit"
               variant="outlined"
-              onClick={(e) => setAddUser(!addUser)}
+              onClick={(e) => {
+                setAddUser(!addUser);
+                setpermissionName([]);
+              }}
             >
               Cancel
             </Button>

@@ -8,6 +8,7 @@ import Input from "@mui/material/Input";
 import CardActions from "@mui/material/CardActions";
 import {
   FormControl,
+  Grid,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -40,14 +41,15 @@ const UserComp = (props) => {
   const [user, setUser] = useState({});
   const [editUser, setEditUser] = useState(false);
   const [disable, setdisable] = useState(true);
-  const [personName, setPersonName] = useState([]);
+  const [permissionName, setpermissionName] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
+      console.log(props.user);
       setUser(props.user);
     }
     fetchData();
-  }, [props]);
+  }, []);
 
   const deleteUser = async () => {
     let resp = await UsersUtils.deleteUser(props.user.id);
@@ -57,6 +59,8 @@ const UserComp = (props) => {
   const updateUser = async () => {
     let resp = await UsersUtils.EditUser(props.user.id, user);
     setEditUser(!editUser);
+    setpermissionName([]);
+    setdisable(!disable);
     props.updateUser(resp);
   };
 
@@ -64,7 +68,7 @@ const UserComp = (props) => {
     const {
       target: { value },
     } = event;
-    setPersonName(typeof value === "string" ? value.split(",") : value);
+    setpermissionName(typeof value === "string" ? value.split(",") : value);
   };
 
   return (
@@ -81,7 +85,7 @@ const UserComp = (props) => {
           First Name :{" "}
           <Input
             name="FName"
-            value={user.FirstName}
+            value={props.user.FirstName}
             disabled={disable}
             onChange={(e) => setUser({ ...user, FirstName: e.target.value })}
           />{" "}
@@ -89,7 +93,7 @@ const UserComp = (props) => {
           Last Name :{" "}
           <Input
             name="LName"
-            value={user.LastName}
+            value={props.user.LastName}
             disabled={disable}
             onChange={(e) => setUser({ ...user, LastName: e.target.value })}
           />{" "}
@@ -97,37 +101,48 @@ const UserComp = (props) => {
           User Name :{" "}
           <Input
             name="userName"
-            value={user.userName}
+            value={props.user.userName}
             disabled={disable}
             onChange={(e) => setUser({ ...user, userName: e.target.value })}
           />
           <br />
           Permissons:
+          {props.user.Permissions.length > 0 && (
+            <Grid item xs={6}>
+              <ul>
+                {props.user.Permissions.map((per, index) => {
+                  return <li key={index}>{per}</li>;
+                })}
+              </ul>
+            </Grid>
+          )}
           <br />
-          <FormControl sx={{ m: 1, width: 300 }} style={{ width: "80%" }}>
-            <InputLabel id="demo-multiple-name-label">Permissons</InputLabel>
-            <Select
-              labelId="demo-multiple-checkbox-label"
-              id="demo-multiple-checkbox"
-              multiple
-              value={personName}
-              onChange={handleChange}
-              input={<OutlinedInput label="Tag" />}
-              renderValue={(selected) => selected.join(", ")}
-              MenuProps={MenuProps}
-              disabled={disable}
-              onClose={() => {
-                setUser({ ...user, Permissions: personName });
-              }}
-            >
-              {names.map((name) => (
-                <MenuItem key={name} value={name}>
-                  <Checkbox checked={personName.indexOf(name) > -1} />
-                  <ListItemText primary={name} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {!disable && (
+            <FormControl sx={{ m: 1, width: 300 }} style={{ width: "80%" }}>
+              <InputLabel id="demo-multiple-name-label">Permissons</InputLabel>
+              <Select
+                labelId="demo-multiple-checkbox-label"
+                id="demo-multiple-checkbox"
+                multiple
+                value={permissionName}
+                onChange={handleChange}
+                input={<OutlinedInput label="Tag" />}
+                renderValue={(selected) => selected.join(", ")}
+                MenuProps={MenuProps}
+                disabled={disable}
+                onClose={() => {
+                  setUser({ ...user, Permissions: permissionName });
+                }}
+              >
+                {names.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    <Checkbox checked={permissionName.indexOf(name) > -1} />
+                    <ListItemText primary={name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
           <br /> <br />
           {!disable && (
             <Button
@@ -139,7 +154,6 @@ const UserComp = (props) => {
               Update User
             </Button>
           )}
-          <br />
           <br />
           <CardActions>
             <div>
